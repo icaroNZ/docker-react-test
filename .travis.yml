@@ -8,3 +8,16 @@ before_install:
 
 script:
   - docker run icaronz/docker-react-test npm run test -- --coverage
+
+deploy:
+  provider: elasticbeanstalk
+  region: 'eu-west-1'
+  app: 'icaro-test-docker'
+  env: 'IcaroTestDocker-env'
+  bucket_name: 'elasticbeanstalk-eu-west-1-846692099021'
+  bucket_path: 'icaro-test-docker'
+  on:
+    branch: master
+#  access_key_id: $AWS_ACCESS_KEY
+#  secret_access_key:
+#    secure: '$AWS_SECRET_KEY'
