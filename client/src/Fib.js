@@ -2,19 +2,21 @@ import React, { Component } from 'react';
 import axios from 'axios';
 class Fib extends Component {
   state = {
-    seemIndexes: [],
+    seenIndexes: [],
     values: {},
     index: ''
   };
 
   async fetchIndexes() {
+    console.log('/api/values/all');
     const indexes = await axios.get('/api/values/all');
     this.setState({
-      seemIndexes: indexes.data
+      seenIndexes: indexes.data
     });
   }
 
   async fetchValues() {
+    console.log('/api/values/current');
     const values = await axios.get('/api/values/current');
     this.setState({
       values: values.data
@@ -22,7 +24,7 @@ class Fib extends Component {
   }
 
   renderSeenIndexes() {
-    return this.state.seemIndexes.map((number) => number).join(', ');
+    return this.state.seenIndexes.map(({ number }) => number).join(', ');
   }
 
   renderValues() {
@@ -30,7 +32,7 @@ class Fib extends Component {
     for (let key in this.state.values) {
       entries.push(
         <div key={key}>
-          For index {key} I calculate {this.state.values[key]}
+          For index {key} I calculated {this.state.values[key]}
         </div>
       );
     }
@@ -39,7 +41,8 @@ class Fib extends Component {
 
   handleSubmit = async (event) => {
     event.preventDefault();
-    await axios.post('api/values', {
+    console.log('/api/values', this.state.index);
+    await axios.post('/api/values', {
       index: this.state.index
     });
     this.setState({ index: '' });
@@ -61,9 +64,9 @@ class Fib extends Component {
           <button>Submit</button>
         </form>
         <h3>Indexes I have seem:</h3>
-        {this.renderSeenIndexes}
+        {this.renderSeenIndexes()}
         <h3>Calculate values</h3>
-        {this.renderValues}
+        {this.renderValues()}
       </div>
     );
   }

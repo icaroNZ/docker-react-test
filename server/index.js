@@ -35,26 +35,30 @@ const redisPublisher = redisClient.duplicate();
 
 // Express routes
 app.get('/', (_req, res) => {
+  console.log('I am here!!!');
   res.send('I am here!');
 });
 
 app.get('/values/all', async (_req, res) => {
+  console.log('server all');
   const values = await pgClient.query('SELECT * from values');
   res.send(values.rows);
 });
 
 app.get('/values/current', async (_req, res) => {
+  console.log('server current');
   redisClient.hgetall('values', (_error, values) => {
     res.send(values);
   });
 });
 
-app.get('/values', async (req, res) => {
+app.post('/values', async (req, res) => {
+  console.log('get value', req.body.index);
   const index = req.body.index;
   if (parseInt(index) > 30) {
     return res.status(422).send('Index too high');
   }
-  redisClient.hset('values', index, 'Not Calculates yet!');
+  redisClient.hset('values', index, 'No values calculated yet!');
   redisPublisher.publish('insert', index);
   pgClient.query('INSERT INTO values(number) VALUES ($1)', [index]);
   res.send({ working: true });
