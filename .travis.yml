@@ -4,20 +4,19 @@ services:
   - docker
 
 before_install:
-  - docker build -t icaronz/docker-react-test -f Dockerfile.dev .
+  - docker build -t icaronz/docker-react-test -f ./client/Dockerfile.dev ./client
 
 script:
   - docker run icaronz/docker-react-test npm run test -- --coverage
 
-deploy:
-  provider: elasticbeanstalk
-  region: 'eu-west-1'
-  app: 'icaro-test-docker'
-  env: 'IcaroTestDocker-env'
-  bucket_name: 'elasticbeanstalk-eu-west-1-846692099021'
-  bucket_path: 'icaro-test-docker'
-  on:
-    branch: master
-#  access_key_id: $AWS_ACCESS_KEY
-#  secret_access_key:
-#    secure: '$AWS_SECRET_KEY'
+after_success:
+  - docker build -t icaronz/multi-client ./client
+  - docker build -t icaronz/multi-nginx ./nginx
+  - docker build -t icaronz/multi-server ./server
+  - docker build -t icaronz/multi-worker ./worker
+
+  - echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_ID" --password-stdin
+  - docker push icaronz/multi-client
+  - docker push icaronz/multi-nginx
+  - docker push icaronz/multi-server
+  - docker push icaronz/multi-worker
